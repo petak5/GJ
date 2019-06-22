@@ -14,17 +14,17 @@ def getFileNumber(fileName):
 def getFileChapter(fileName):
     return fileName[-10] + fileName[-9]
 
-curr_dir = os.getcwd() + '/'
 temp_list_name = '.temp_list.txt'
 str_directory = str(os.path.abspath(sys.argv[1])) + '/'
 directory = os.fsencode(str_directory)
+os.chdir(directory)
 
 files = []
 
 for file in os.listdir(directory):
     filename = os.fsdecode(file)
     if filename.endswith(".MP4") or filename.endswith(".mp4"):
-        files.append(str_directory + filename)
+        files.append(filename)
 
 fileNumbers = {}
 for file in files:
@@ -42,19 +42,17 @@ for key, value in list(fileNumbers.items()):
         del fileNumbers[key]
 
 for number, chapters in fileNumbers.items():
-    with open(curr_dir + temp_list_name, 'w') as the_file:
+    with open(temp_list_name, 'w') as the_file:
         files = []
         for chapter in chapters:
             files.append('GX' + chapter + number + '.MP4')
         files.sort()
         for file in files:
-            the_file.write('file \'' + str_directory + file + '\'\n')
+            the_file.write('file \'' + file + '\'\n')
 
-    print('ffmpeg -f concat -safe 0 -i "' + curr_dir + temp_list_name + '" -c copy "' + str_directory + 'GX00' + number + '.MP4"')
+    os.system('ffmpeg -f concat -safe 0 -i "' + temp_list_name + '" -c copy "' + 'GX00' + number + '.MP4"')
 
 #print(fileNumbers)
 
-if os.path.isfile(curr_dir + temp_list_name):
-    os.remove(curr_dir + temp_list_name)
-
-# Warning: Using the full path does not work, one has to use just the file names (and *single* quotes)
+if os.path.isfile(temp_list_name):
+    os.remove(temp_list_name)
